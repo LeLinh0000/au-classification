@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <title>Nhận dạng cơ quan nội tạng</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+        <link href="/static/bootstrap.min.css" rel="stylesheet">
+        <link href="/static/main.css" rel="stylesheet">
+    </head>
+    <body>
+        <!-- Navigation (Stays on Top) -->
+        <div class="w3-top w3-bar w3-black">
+            <a href="#home" class="w3-bar-item w3-button">Home</a>
+            <a href="#about" class="w3-bar-item w3-button">About</a>
+            <a href="#members" class="w3-bar-item w3-button">Members</a>
+            <a href="#contact" class="w3-bar-item w3-button">Contact</a>
+        </div>
+        <div class="w3-content" style="max-width:2000px;margin-top:46px">
+            
+            <div class="container">
+                <h1>Please choose image</h1>
+                <br>
+                <form action="http://localhost:5000/uploader" method="post"  enctype="multipart/form-data">
+    
+                    <div class="form-group">
+                        <input type="file" name="coverImage" class="form-control" id="exampleInputFile" value="{{
+                            request.form.coverImage }}" placeholder="Choose image"/>
+                    </div>
+                    
+                    <input class="btn btn-success" type="submit" value="Run">
+    
+                </form>
+                <div class="imageFrame">
+                    <img id="target" style="height: 100%; width: 100%;"/>
+                    <!-- <div class="overLayer">
+                
+                    </div> -->
+                </div>
+                <div style="margin-top: 20px;">
+                    <input id="result" type="text" placeholder="">
+                </div>
+                {% if error %}
+                <p class="error"><strong>Error:</strong> {{ error }}
+                    {% endif %}
+            </div>
+        </div>
+    </body>
+</html>
+
+<script type="text/javascript"  src="static/jquery-3.6.0.min.js"></script>
+<script>
+    const input = document.querySelector('#exampleInputFile');
+    const imageFrame = document.querySelector('.imageFrame');
+    function readURL(input) {
+        if (input.files && input.files[0]) {
+            var reader = new FileReader();
+            reader.onload = function(e) {
+                $('#target')
+                    .attr('src', e.target.result)
+            };
+            console.log(input.files[0]);
+            reader.readAsDataURL(input.files[0]);   
+        }
+    }
+
+    input.onchange = () => readURL(input);
+
+    let result = fetch('http://localhost:5000/api/predict')
+                .then(response => response.json())
+                .then(data => {
+                    console.log(data)
+                    document.querySelector('#result').placeholder = data.label
+                    return data
+                })
+                .catch(error => {console.error(error);})
+    
+</script>
